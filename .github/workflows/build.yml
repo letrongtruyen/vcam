@@ -13,26 +13,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install dependencies
+      - name: Install build tools
         run: |
-          brew install make ldid
+          xcode-select --install || true
+          xcodebuild -version
+          xcrun --sdk iphoneos --show-sdk-path
+          brew install make ldid || true
 
-      - name: Clone Theos & SDKs
+      - name: Clone Theos
         run: |
-          git clone --recursive https://github.com/theos/theos.git $HOME/theos
-          curl -LO https://github.com/theos/sdks/releases/download/v14.5/iPhoneOS14.5.sdk.tar.xz
-          mkdir -p $HOME/theos/sdks
-          tar -xf iPhoneOS14.5.sdk.tar.xz -C $HOME/theos/sdks
-
-      - name: Prepare Theos environment
-        run: |
-          echo "THEOS=$HOME/theos" >> $GITHUB_ENV
+          git clone --depth=1 --recursive https://github.com/theos/theos.git "$HOME/theos"
+          echo "THEOS=$HOME/theos" >> "$GITHUB_ENV"
+          echo "$HOME/theos/bin" >> "$GITHUB_PATH"
 
       - name: Make build script executable
         run: |
           chmod +x build.sh
 
       - name: Run build script
+        env:
+          THEOS: ${{ env.THEOS }}
         run: |
           ./build.sh
 
@@ -40,4 +40,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: vcam-rootless-deb
-          path: "*.deb"
+          path: |
+            packages/*.deb
+          if-no-files-found: error

@@ -34,16 +34,18 @@ cat > "$APP_DIR/Info.plist" << 'PLIST'
 PLIST
 
 # 2. Biên dịch ContentView.swift thành file thực thi iOS
-if command -v swiftc >/dev/null 2>&1; then
+if command -v swiftc >/dev/null 2>&1 && command -v xcrun >/dev/null 2>&1; then
     SDK_PATH=$(xcrun --sdk iphoneos --show-sdk-path)
     swiftc -target arm64-apple-ios16.0 -sdk "$SDK_PATH" -parse-as-library "$PROJECT_ROOT/ContentView.swift" -o "$APP_DIR/VCamApp"
     echo "[1/2] Đã biên dịch App SwiftUI thành công."
 else
-    echo "Bỏ qua build App (Cần macOS để chạy swiftc)"
+    echo "Bỏ qua build App (Cần macOS/Xcode để chạy swiftc/xcrun)"
 fi
 
 # 3. Đóng gói Theos Tweak
-if [ -d "$THEOS" ]; then
-    $THEOS/bin/make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
+if [ -n "${THEOS:-}" ] && [ -d "$THEOS" ]; then
+    "$THEOS/bin/make" package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
     echo "[2/2] Đã đóng gói .deb thành công!"
+else
+    echo "THEOS chưa được thiết lập, bỏ qua package .deb."
 fi
