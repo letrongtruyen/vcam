@@ -1,0 +1,13 @@
+Package: com.vcam.ios
+Name: iOS Virtual Camera
+Version: 1.0.0
+Architecture: iphoneos-arm64
+Description: A rootless virtual camera control tweak for iOS 16.7.x with media input handling.
+Maintainer: VCam Dev <dev@vcam.local>
+Author: VCam Dev
+Section: Tweaks
+Depends: mobilesubstrate
+Priority: optional
+Installed-Size: 4096
+Homepage: https://example.com
+Tag: role::hacking

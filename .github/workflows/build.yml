@@ -1,0 +1,69 @@
+name: Build VCam Rootless .deb
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          set -eux
+          uname -a
+          xcode-select -p
+          sudo xcodebuild -version
+          sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+
+      - name: Clone Theos
+        shell: bash
+        run: |
+          set -eux
+          cd "$GITHUB_WORKSPACE"
+          git clone --depth=1 https://github.com/theos/theos.git theos
+          git clone --depth=1 https://github.com/theos/ldid.git ldid
+          cd ldid
+          make
+          sudo cp ./ldid /usr/local/bin/ldid
+
+      - name: Prepare Theos environment
+        shell: bash
+        run: |
+          set -eux
+          export THEOS="$GITHUB_WORKSPACE/theos"
+          export PATH="$THEOS/bin:$PATH"
+          echo "THEOS=$THEOS" >> "$GITHUB_ENV"
+          echo "$THEOS/bin" >> "$GITHUB_PATH"
+
+          ls -la "$THEOS"
+          ls -la "$THEOS/bin" || true
+
+      - name: Make build script executable
+        shell: bash
+        run: |
+          set -eux
+          chmod +x "$GITHUB_WORKSPACE/build.sh"
+
+      - name: Run build script
+        shell: bash
+        env:
+          THEOS: ${{ github.workspace }}/theos
+        run: |
+          set -eux
+          cd "$GITHUB_WORKSPACE"
+          ./build.sh
+
+      - name: Publish artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vcam-rootless-deb
+          path: |
+            ${{ github.workspace }}/packages/*.deb
+          if-no-files-found: error
