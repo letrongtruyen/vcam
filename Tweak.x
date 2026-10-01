@@ -161,14 +161,17 @@ static CMSampleBufferRef VCamCreateSampleBufferFromPixelBuffer(CVPixelBufferRef 
     }
 
     CMSampleBufferRef sampleBuffer = NULL;
-    NSDictionary *emptyTiming = @{};
-    CFDictionaryRef sampleTiming = (__bridge CFDictionaryRef)emptyTiming;
+    CMSampleTimingInfo sampleTiming = {
+        .duration = kCMTimeInvalid,
+        .presentationTimeStamp = kCMTimeZero,
+        .decodeTimeStamp = kCMTimeInvalid
+    };
 
     OSStatus sampleStatus = CMSampleBufferCreateReadyWithImageBuffer(
         kCFAllocatorDefault,
         pixelBuffer,
         formatDescription,
-        sampleTiming,
+        &sampleTiming,
         &sampleBuffer
     );
 
