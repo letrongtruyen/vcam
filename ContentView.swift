@@ -75,7 +75,7 @@ struct ContentView: View {
 
                         PhotosPicker(
                             selection: $selectedPhotoItem,
-                            matching: .any(of: [.image, .movie]),
+                            matching: .any(of: [.images, .videos]),
                             preferredItemEncoding: .current,
                             label: {
                                 HStack {
