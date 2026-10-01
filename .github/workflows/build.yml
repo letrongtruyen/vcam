@@ -1,9 +1,9 @@
 name: Build VCam Rootless .deb
 
 on:
-  workflow_dispatch:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -14,56 +14,27 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install dependencies
-        shell: bash
         run: |
-          set -eux
-          uname -a
-          xcode-select -p
-          sudo xcodebuild -version
-          sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+          brew install make ldid
 
       - name: Clone Theos
-        shell: bash
         run: |
-          set -eux
-          cd "$GITHUB_WORKSPACE"
-          git clone --depth=1 https://github.com/theos/theos.git theos
-          git clone --depth=1 https://github.com/theos/ldid.git ldid
-          cd ldid
-          make
-          sudo cp ./ldid /usr/local/bin/ldid
+          git clone --recursive https://github.com/theos/theos.git $HOME/theos
 
       - name: Prepare Theos environment
-        shell: bash
         run: |
-          set -eux
-          export THEOS="$GITHUB_WORKSPACE/theos"
-          export PATH="$THEOS/bin:$PATH"
-          echo "THEOS=$THEOS" >> "$GITHUB_ENV"
-          echo "$THEOS/bin" >> "$GITHUB_PATH"
-
-          ls -la "$THEOS"
-          ls -la "$THEOS/bin" || true
+          echo "THEOS=$HOME/theos" >> $GITHUB_ENV
 
       - name: Make build script executable
-        shell: bash
         run: |
-          set -eux
-          chmod +x "$GITHUB_WORKSPACE/build.sh"
+          chmod +x build.sh
 
       - name: Run build script
-        shell: bash
-        env:
-          THEOS: ${{ github.workspace }}/theos
         run: |
-          set -eux
-          cd "$GITHUB_WORKSPACE"
           ./build.sh
 
-      - name: Publish artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: vcam-rootless-deb
-          path: |
-            ${{ github.workspace }}/packages/*.deb
-          if-no-files-found: error
+          path: "*.deb"
