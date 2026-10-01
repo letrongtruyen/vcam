@@ -17,9 +17,12 @@ jobs:
         run: |
           brew install make ldid
 
-      - name: Clone Theos
+      - name: Clone Theos & SDKs
         run: |
           git clone --recursive https://github.com/theos/theos.git $HOME/theos
+          curl -LO https://github.com/theos/sdks/releases/download/v14.5/iPhoneOS14.5.sdk.tar.xz
+          mkdir -p $HOME/theos/sdks
+          tar -xf iPhoneOS14.5.sdk.tar.xz -C $HOME/theos/sdks
 
       - name: Prepare Theos environment
         run: |
