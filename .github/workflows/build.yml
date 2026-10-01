@@ -23,6 +23,8 @@ jobs:
       - name: Clone Theos
         run: |
           git clone --depth=1 --recursive https://github.com/theos/theos.git "$HOME/theos"
+          ls -la "$HOME/theos"
+          ls -la "$HOME/theos/bin" || true
           echo "THEOS=$HOME/theos" >> "$GITHUB_ENV"
           echo "$HOME/theos/bin" >> "$GITHUB_PATH"
 
@@ -34,6 +36,7 @@ jobs:
         env:
           THEOS: ${{ env.THEOS }}
         run: |
+          export PATH="$THEOS/bin:$PATH"
           ./build.sh
 
       - name: Upload artifact

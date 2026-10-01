@@ -44,8 +44,15 @@ fi
 
 # 3. Đóng gói Theos Tweak
 if [ -n "${THEOS:-}" ] && [ -d "$THEOS" ]; then
-    "$THEOS/bin/make" package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-    echo "[2/2] Đã đóng gói .deb thành công!"
+    export PATH="$THEOS/bin:$PATH"
+    if command -v make >/dev/null 2>&1; then
+        make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
+        echo "[2/2] Đã đóng gói .deb thành công!"
+    else
+        echo "make không tồn tại trong PATH. Cần môi trường Theos trên macOS."
+        exit 1
+    fi
 else
     echo "THEOS chưa được thiết lập, bỏ qua package .deb."
+    exit 1
 fi
