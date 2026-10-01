@@ -89,7 +89,7 @@ struct ContentView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                             }
                         )
-                        .onChange(of: selectedPhotoItem) { _, newValue in
+                        .onChange(of: selectedPhotoItem) { newValue in
                             guard let item = newValue else { return }
                             handleSelectedPhotoPickerItem(item)
                         }
