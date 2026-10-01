@@ -6,8 +6,8 @@
 #import <CoreFoundation/CoreFoundation.h>
 #import <objc/runtime.h>
 
-#define VCamConfigPath "/var/mobile/Library/Preferences/VCam/config.plist"
-#define VCamMediaDirectory "/var/mobile/Library/Preferences/VCam/input_media"
+#define VCamConfigPath @"/var/mobile/Library/Preferences/VCam/config.plist"
+#define VCamMediaDirectory @"/var/mobile/Library/Preferences/VCam/input_media"
 #define VCamNotificationName CFSTR("com.vcam.settingschanged")
 
 static BOOL VCamEnabled = NO;
@@ -161,11 +161,14 @@ static CMSampleBufferRef VCamCreateSampleBufferFromPixelBuffer(CVPixelBufferRef 
     }
 
     CMSampleBufferRef sampleBuffer = NULL;
+    NSDictionary *emptyTiming = @{};
+    CFDictionaryRef sampleTiming = (__bridge CFDictionaryRef)emptyTiming;
+
     OSStatus sampleStatus = CMSampleBufferCreateReadyWithImageBuffer(
         kCFAllocatorDefault,
         pixelBuffer,
         formatDescription,
-        NULL,
+        sampleTiming,
         &sampleBuffer
     );
 
